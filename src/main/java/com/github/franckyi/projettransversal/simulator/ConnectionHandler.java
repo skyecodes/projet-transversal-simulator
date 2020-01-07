@@ -16,9 +16,7 @@ public class ConnectionHandler {
                 String user = "franckyi_projet";
                 String passwd = "Projet2019!";
                 connection = DriverManager.getConnection(url, user, passwd);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (SQLException e) {
+            } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
             }
         }
