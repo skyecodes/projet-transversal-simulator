@@ -1,7 +1,9 @@
 package com.github.franckyi.projettransversal.simulator;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import com.github.franckyi.projettransversal.common.ConnectionHandler;
+import com.github.franckyi.projettransversal.common.dao.DAOFactory;
+import com.github.franckyi.projettransversal.common.model.Feu;
+
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -11,53 +13,32 @@ public class Simulator {
 
     private static final Random RANDOM = new Random();
 
-    public static void main(String[] args) throws InterruptedException {
+    // intervalle de temps entre 2 feux (secondes)
+    private static final int MIN_INTERVAL = 30;
+    private static final int MAX_INTERVAL = 90;
+
+    public static void main(String[] args) throws InterruptedException, SQLException {
+        if (args.length > 0) {
+            if (args[0].equals("reset")) {
+                System.out.println("Reset...");
+                ConnectionHandler.getConnection().createStatement().execute("TRUNCATE TABLE feux RESTART IDENTITY");
+                System.out.println("OK\n-----");
+            }
+        }
         while (true) {
-            createNewFire();
-            System.out.println("---");
-            Thread.sleep(RANDOM.nextInt(60000) + 30000);
-        }
-    }
-
-    public static void createNewFire() {
-        try {
             System.out.println("New fire");
-            int row = RANDOM.nextInt(6);
-            int col = RANDOM.nextInt(10);
-            System.out.println(String.format("Row = %d; Col = %d", row, col));
-
-            int pointId = getPointId(row, col);
-            int intensity = RANDOM.nextInt(9) + 1;
-            Timestamp date = Timestamp.from(Instant.now());
-            System.out.println(String.format("PointID = %d; Intensity = %d; Date = %d", pointId, intensity, date.getTime()));
-
-            insertFire(pointId, intensity, date);
+            Feu feu = new Feu(
+                    RANDOM.nextInt(60) + 1,
+                    RANDOM.nextInt(9) + 1,
+                    Timestamp.from(Instant.now())
+            );
+            System.out.println(String.format("idPoint=%d; intensite=%d; date=%d", feu.getIdPoint(), feu.getIntensite(), feu.getDate().getTime()));
+            DAOFactory.getFeuDAO().create(feu);
             System.out.println("Done");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    private static void insertFire(int pointId, int intensity, Timestamp date) throws SQLException {
-        PreparedStatement stmt = ConnectionHandler.getConnection().prepareStatement("INSERT INTO feux(id_point, intensite, date) VALUES (?, ?, ?)");
-        stmt.setInt(1, pointId);
-        stmt.setInt(2, intensity);
-        stmt.setTimestamp(3, date);
-        stmt.execute();
-        stmt.close();
-    }
-
-    private static int getPointId(int row, int col) throws SQLException {
-        PreparedStatement stmt = ConnectionHandler.getConnection().prepareStatement("SELECT id_point FROM points WHERE ligne = ? AND colonne = ?");
-        stmt.setInt(1, row);
-        stmt.setInt(2, col);
-        ResultSet rs = stmt.executeQuery();
-        if (!rs.next()) {
-            throw new SQLException(String.format("No point found for row=%d;col=%d", row, col));
+            int sleep = RANDOM.nextInt((MAX_INTERVAL - MIN_INTERVAL) * 1000) + MIN_INTERVAL * 1000;
+            System.out.println(String.format("----- Waiting for %d seconds", sleep / 1000));
+            Thread.sleep(sleep);
         }
-        int idPoint = rs.getInt("id_point");
-        rs.close();
-        stmt.close();
-        return idPoint;
     }
 }

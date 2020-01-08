@@ -1,4 +1,4 @@
-package com.github.franckyi.projettransversal.simulator;
+package com.github.franckyi.projettransversal.common;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
