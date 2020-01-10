@@ -1,11 +1,25 @@
 package com.github.franckyi.projettransversal.common.model;
 
-public class Point {
+import com.github.franckyi.projettransversal.common.dao.PointDAO;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
+@DatabaseTable(tableName = "points", daoClass = PointDAO.class)
+public class Point implements Position {
+
+    @DatabaseField(generatedId = true, columnName = "id_point")
     private int idPoint;
+
+    @DatabaseField(columnName = "colonne")
     private int colonne;
+
+    @DatabaseField(columnName = "ligne")
     private int ligne;
+
+    @DatabaseField(columnName = "longitude")
     private double longitude;
+
+    @DatabaseField(columnName = "latitude")
     private double latitude;
 
     public Point() {

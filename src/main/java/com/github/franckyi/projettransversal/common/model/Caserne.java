@@ -1,10 +1,25 @@
 package com.github.franckyi.projettransversal.common.model;
 
-public class Caserne {
+import com.github.franckyi.projettransversal.common.dao.CaserneDAO;
+import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
 
+@DatabaseTable(tableName = "casernes", daoClass = CaserneDAO.class)
+public class Caserne implements Position {
+
+    @DatabaseField(generatedId = true, columnName = "id_caserne")
     private int idCaserne;
+
+    @DatabaseField(columnName = "longitude")
     private double longitude;
+
+    @DatabaseField(columnName = "latitude")
     private double latitude;
+
+    @ForeignCollectionField(eager = false)
+    private ForeignCollection<Camion> camions;
 
     public Caserne() {
     }
@@ -41,5 +56,13 @@ public class Caserne {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+    }
+
+    public ForeignCollection<Camion> getCamions() {
+        return camions;
+    }
+
+    public void setCamions(ForeignCollection<Camion> camions) {
+        this.camions = camions;
     }
 }

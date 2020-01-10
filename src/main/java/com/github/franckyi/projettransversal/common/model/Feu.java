@@ -1,24 +1,41 @@
 package com.github.franckyi.projettransversal.common.model;
 
-import java.sql.Timestamp;
+import com.github.franckyi.projettransversal.common.dao.FeuDAO;
+import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
 
+import java.util.Date;
+
+@DatabaseTable(tableName = "feux", daoClass = FeuDAO.class)
 public class Feu {
 
+    @DatabaseField(generatedId = true, columnName = "id_feu")
     private int idFeu;
-    private int idPoint;
+
+    @DatabaseField(canBeNull = false, foreign = true, columnName = "id_point")
+    private Point point;
+
+    @DatabaseField(columnName = "intensite")
     private int intensite;
-    private Timestamp date;
+
+    @DatabaseField(columnName = "date")
+    private Date date;
+
+    @ForeignCollectionField(eager = false)
+    private ForeignCollection<Intervention> interventions;
 
     public Feu() {
     }
 
-    public Feu(int idPoint, int intensite, Timestamp date) {
-        this(0, idPoint, intensite, date);
+    public Feu(Point point, int intensite, Date date) {
+        this(0, point, intensite, date);
     }
 
-    public Feu(int idFeu, int idPoint, int intensite, Timestamp date) {
+    public Feu(int idFeu, Point point, int intensite, Date date) {
         this.idFeu = idFeu;
-        this.idPoint = idPoint;
+        this.point = point;
         this.intensite = intensite;
         this.date = date;
     }
@@ -31,12 +48,12 @@ public class Feu {
         this.idFeu = idFeu;
     }
 
-    public int getIdPoint() {
-        return idPoint;
+    public Point getPoint() {
+        return point;
     }
 
-    public void setIdPoint(int idPoint) {
-        this.idPoint = idPoint;
+    public void setPoint(Point point) {
+        this.point = point;
     }
 
     public int getIntensite() {
@@ -47,11 +64,19 @@ public class Feu {
         this.intensite = intensite;
     }
 
-    public Timestamp getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(Date date) {
         this.date = date;
+    }
+
+    public ForeignCollection<Intervention> getInterventions() {
+        return interventions;
+    }
+
+    public void setInterventions(ForeignCollection<Intervention> interventions) {
+        this.interventions = interventions;
     }
 }

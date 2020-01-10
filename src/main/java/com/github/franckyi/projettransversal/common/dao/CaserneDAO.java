@@ -1,53 +1,15 @@
 package com.github.franckyi.projettransversal.common.dao;
 
 import com.github.franckyi.projettransversal.common.model.Caserne;
+import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.support.ConnectionSource;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CaserneDAO extends DAO<Caserne> {
+public class CaserneDAO extends BaseDaoImpl<Caserne, Integer> {
 
-    public CaserneDAO(Connection connection) {
-        super(connection);
+    public CaserneDAO(ConnectionSource connectionSource) throws SQLException {
+        super(connectionSource, Caserne.class);
     }
 
-    @Override
-    protected boolean doCreate(Caserne obj) throws SQLException {
-        PreparedStatement stmt = connection.prepareStatement("INSERT INTO casernes (longitude, latitude) VALUES (?, ?)");
-        stmt.setDouble(1, obj.getLongitude());
-        stmt.setDouble(2, obj.getLatitude());
-        return stmt.execute();
-    }
-
-    @Override
-    protected boolean doDelete(Caserne obj) throws SQLException {
-        PreparedStatement stmt = connection.prepareStatement("DELETE FROM casernes WHERE id_caserne = ?");
-        stmt.setInt(1, obj.getIdCaserne());
-        return stmt.execute();
-    }
-
-    @Override
-    protected boolean doUpdate(Caserne obj) throws SQLException {
-        PreparedStatement stmt = connection.prepareStatement("UPDATE casernes SET longitude = ?, latitude = ? WHERE id_caserne = ?");
-        stmt.setDouble(1, obj.getLongitude());
-        stmt.setDouble(2, obj.getLatitude());
-        stmt.setInt(3, obj.getIdCaserne());
-        return stmt.execute();
-    }
-
-    @Override
-    protected Caserne doFind(int id) throws SQLException {
-        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM casernes WHERE id_caserne = ?");
-        stmt.setInt(1, id);
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            return new Caserne(id,
-                    rs.getDouble("longitude"),
-                    rs.getDouble("latitude")
-            );
-        }
-        return null;
-    }
 }

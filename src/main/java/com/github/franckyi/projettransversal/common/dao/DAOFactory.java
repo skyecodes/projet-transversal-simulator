@@ -1,44 +1,61 @@
 package com.github.franckyi.projettransversal.common.dao;
 
 import com.github.franckyi.projettransversal.common.ConnectionHandler;
+import com.github.franckyi.projettransversal.common.model.*;
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.support.ConnectionSource;
 
-import java.sql.Connection;
+import java.sql.SQLException;
 
 public class DAOFactory {
 
-    private static final Connection connection = ConnectionHandler.getConnection();
-
-    private static CamionDAO camionDAO;
-    private static CaserneDAO caserneDAO;
-    private static FeuDAO feuDAO;
-    private static PointDAO pointDAO;
+    private static final ConnectionSource source = ConnectionHandler.getConnection();
 
     public static CamionDAO getCamionDAO() {
-        if (camionDAO == null) {
-            camionDAO = new CamionDAO(connection);
+        try {
+            return DaoManager.createDao(source, Camion.class);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return camionDAO;
     }
 
     public static CaserneDAO getCaserneDAO() {
-        if (caserneDAO == null) {
-            caserneDAO = new CaserneDAO(connection);
+        try {
+            return DaoManager.createDao(source, Caserne.class);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return caserneDAO;
     }
 
     public static FeuDAO getFeuDAO() {
-        if (feuDAO == null) {
-            feuDAO = new FeuDAO(connection);
+        try {
+            return DaoManager.createDao(source, Feu.class);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return feuDAO;
+    }
+
+    public static InterventionDAO getInterventionDAO() {
+        try {
+            return DaoManager.createDao(source, Intervention.class);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static PointDAO getPointDAO() {
-        if (pointDAO == null) {
-            pointDAO = new PointDAO(connection);
+        try {
+            return DaoManager.createDao(source, Point.class);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return pointDAO;
     }
 
+    public static TrajetDAO getTrajetDAO() {
+        try {
+            return DaoManager.createDao(source, Trajet.class);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
