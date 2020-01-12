@@ -3,17 +3,25 @@ package com.github.franckyi.projettransversal.api;
 import java.util.List;
 
 public class Directions {
-    private List<Waypoint> waypoints;
+    private List<Route> routes;
 
-    public List<Waypoint> getWaypoints() {
-        return waypoints;
+    public List<Route> getRoutes() {
+        return routes;
     }
 
-    public static class Waypoint {
-        private List<Double> location;
+    public static class Route {
+        private Geometry geometry;
 
-        public List<Double> getLocation() {
-            return location;
+        public Geometry getGeometry() {
+            return geometry;
+        }
+
+        public static class Geometry {
+            private List<List<Double>> coordinates;
+
+            public List<List<Double>> getCoordinates() {
+                return coordinates;
+            }
         }
     }
 }

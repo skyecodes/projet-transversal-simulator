@@ -6,7 +6,7 @@ public class EmergencyManager {
 
     public static void main(String[] args) {
         Timer timer = new Timer();
-        timer.schedule(new EmergencyManagerTask(), 0, 3000);
+        timer.schedule(new EmergencyManagerTask(), 0, 1000);
     }
 
 }

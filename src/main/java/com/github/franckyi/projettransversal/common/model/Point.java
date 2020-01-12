@@ -5,7 +5,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "points", daoClass = PointDAO.class)
-public class Point implements Position {
+public class Point implements Pos {
 
     @DatabaseField(generatedId = true, columnName = "id_point")
     private int idPoint;

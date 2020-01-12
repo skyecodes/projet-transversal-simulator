@@ -7,7 +7,7 @@ import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "camions", daoClass = CamionDAO.class)
-public class Camion implements Position {
+public class Camion implements Pos {
 
     @DatabaseField(generatedId = true, columnName = "id_camion")
     private int idCamion;

@@ -1,10 +1,11 @@
 package com.github.franckyi.projettransversal.emergencymanager;
 
+import com.github.franckyi.projettransversal.api.APIHandler;
 import com.github.franckyi.projettransversal.common.dao.DAOFactory;
 import com.github.franckyi.projettransversal.common.model.*;
 
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TimerTask;
@@ -18,7 +19,6 @@ public class EmergencyManagerTask extends TimerTask {
             for (Feu feu : DAOFactory.getFeuDAO()) {
                 if (feu.getIntensite() == 0) {
                     if (feu.getInterventions().size() == 0) {
-                        System.out.println(String.format("Feu %d éteint", feu.getIdFeu()));
                         DAOFactory.getFeuDAO().delete(feu);
                         continue;
                     }
@@ -30,8 +30,9 @@ public class EmergencyManagerTask extends TimerTask {
                 } else {
                     DAOFactory.getPointDAO().refresh(feu.getPoint());
                     if (feu.getInterventions().size() == 0) {
-                        System.out.println(String.format("Nouveau feu %d", feu.getIdFeu()));
-                        newIntervention(feu);
+                        if (!newIntervention(feu)) {
+                            break;
+                        }
                     }
                     for (Intervention intervention : feu.getInterventions()) {
                         DAOFactory.getCamionDAO().refresh(intervention.getCamion());
@@ -39,7 +40,11 @@ public class EmergencyManagerTask extends TimerTask {
                         Point point = feu.getPoint();
                         if (camion.posEquals(point)) {
                             feu.setIntensite(feu.getIntensite() - 1);
-                            System.out.println(String.format("Feu %d en cours d'extinction (%d) par le camion %d", feu.getIdFeu(), feu.getIntensite(), camion.getIdCamion()));
+                            if (feu.getIntensite() > 0) {
+                                System.out.println(String.format("Feu %d en cours d'extinction (%d) par le camion %d", feu.getIdFeu(), feu.getIntensite(), camion.getIdCamion()));
+                            } else {
+                                System.out.println(String.format("Feu %d éteint", feu.getIdFeu()));
+                            }
                             DAOFactory.getFeuDAO().update(feu);
                         } else {
                             this.avancer(intervention);
@@ -52,26 +57,39 @@ public class EmergencyManagerTask extends TimerTask {
         }
     }
 
-    private void newIntervention(Feu feu) throws SQLException {
+    private boolean newIntervention(Feu feu) throws SQLException {
         List<Caserne> casernes = DAOFactory.getCaserneDAO().queryForAll();
         casernes.sort(Comparator.comparingDouble(o -> o.distance(feu.getPoint())));
-        Camion camion = null;
-        for (Caserne caserne : casernes) {
-            for (Camion c : caserne.getCamions()) {
-                if (c.posEquals(caserne)) {
-                    camion = c;
-                    break;
-                }
-            }
-        }
+        Camion camion = this.getCamion(casernes);
         if (camion != null) {
+            List<Pos> directions = APIHandler.getDirections(camion.getCaserne(), feu.getPoint());
             System.out.println(String.format("Camion %d affecté au feu %d", camion.getIdCamion(), feu.getIdFeu()));
             Intervention intervention = new Intervention(feu, camion);
             DAOFactory.getInterventionDAO().create(intervention);
-            Trajet trajet0 = new Trajet(camion, 0, camion.getCaserne().getLongitude(), camion.getCaserne().getLatitude());
-            Trajet trajet1 = new Trajet(camion, 1, feu.getPoint().getLongitude(), feu.getPoint().getLatitude());
-            DAOFactory.getTrajetDAO().create(Arrays.asList(trajet0, trajet1));
+            List<Trajet> trajets = new ArrayList<>();
+            int ordre = 1;
+            trajets.add(new Trajet(camion, 0, camion.getCaserne().getLongitude(), camion.getCaserne().getLatitude()));
+            for (Pos pos : directions) {
+                trajets.add(new Trajet(camion, ordre++, pos));
+            }
+            trajets.add(new Trajet(camion, ordre, feu.getPoint().getLongitude(), feu.getPoint().getLatitude()));
+            DAOFactory.getTrajetDAO().create(trajets);
+            return true;
+        } else {
+            System.out.println(String.format("Aucun camion disponible pour feu %d", feu.getIdFeu()));
+            return false;
         }
+    }
+
+    private Camion getCamion(List<Caserne> casernes) {
+        for (Caserne caserne : casernes) {
+            for (Camion camion : caserne.getCamions()) {
+                if (camion.getInterventions().isEmpty()) {
+                    return camion;
+                }
+            }
+        }
+        return null;
     }
 
     private void retour(Intervention intervention) throws SQLException {

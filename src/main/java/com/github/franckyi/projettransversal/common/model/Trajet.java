@@ -5,7 +5,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "trajets", daoClass = TrajetDAO.class)
-public class Trajet implements Position {
+public class Trajet implements Pos {
 
     @DatabaseField(generatedId = true, columnName = "id_trajet")
     private int idTrajet;
@@ -23,6 +23,10 @@ public class Trajet implements Position {
     private double latitude;
 
     public Trajet() {
+    }
+
+    public Trajet(Camion camion, int ordre, Pos pos) {
+        this(camion, ordre, pos.getLongitude(), pos.getLatitude());
     }
 
     public Trajet(Camion camion, int ordre, double longitude, double latitude) {
