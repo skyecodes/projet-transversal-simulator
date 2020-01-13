@@ -12,6 +12,10 @@ public class FeuDAO extends BaseDaoImpl<Feu, Integer> {
         super(connectionSource, Feu.class);
     }
 
+    public boolean canGenerate() throws SQLException {
+        return this.countOf() <= 4;
+    }
+
     public boolean isPointValid(int idPoint) throws SQLException {
         return this.queryForEq("id_point", idPoint).isEmpty();
     }

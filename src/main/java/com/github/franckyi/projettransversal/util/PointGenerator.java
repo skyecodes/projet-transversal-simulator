@@ -1,5 +1,6 @@
 package com.github.franckyi.projettransversal.util;
 
+import com.github.franckyi.projettransversal.common.ConnectionHandler;
 import com.github.franckyi.projettransversal.common.dao.DAOFactory;
 import com.github.franckyi.projettransversal.common.model.Point;
 
@@ -70,7 +71,8 @@ public class PointGenerator {
             {45.724996912611786, 4.88719940185547}
     };
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        ConnectionHandler.init(ConnectionHandler.Database.SIMULATION);
         if (args.length > 0) {
             if (args[0].equals("reset")) {
                 System.out.println("Reset...");

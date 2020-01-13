@@ -1,5 +1,6 @@
 package com.github.franckyi.projettransversal.util;
 
+import com.github.franckyi.projettransversal.common.ConnectionHandler;
 import com.github.franckyi.projettransversal.common.dao.DAOFactory;
 import com.github.franckyi.projettransversal.common.model.Camion;
 import com.github.franckyi.projettransversal.common.model.Caserne;
@@ -9,7 +10,8 @@ import java.util.Arrays;
 
 public class CaserneGenerator {
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        ConnectionHandler.init(ConnectionHandler.Database.REEL);
         if (args.length > 0) {
             if (args[0].equals("reset")) {
                 System.out.println("Reset...");
